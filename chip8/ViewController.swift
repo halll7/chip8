@@ -10,10 +10,11 @@ import Cocoa
 
 class ViewController: NSViewController {
 
+    private let emu = Emulator()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        emu.start()
     }
 
     override var representedObject: Any? {

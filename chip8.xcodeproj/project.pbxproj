@@ -11,6 +11,10 @@
 		D8314CF720FE8B1800BC853F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314CF620FE8B1800BC853F /* ViewController.swift */; };
 		D8314CF920FE8B1B00BC853F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8314CF820FE8B1B00BC853F /* Assets.xcassets */; };
 		D8314CFC20FE8B1B00BC853F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8314CFA20FE8B1B00BC853F /* Main.storyboard */; };
+		D8314D0520FE8FA400BC853F /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0420FE8FA400BC853F /* Memory.swift */; };
+		D8314D0720FE907D00BC853F /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0620FE907D00BC853F /* CPU.swift */; };
+		D8314D0920FE91D500BC853F /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0820FE91D500BC853F /* Stack.swift */; };
+		D8314D0B20FE952E00BC853F /* Emulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0A20FE952E00BC853F /* Emulator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +25,10 @@
 		D8314CFB20FE8B1B00BC853F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D8314CFD20FE8B1B00BC853F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D8314CFE20FE8B1B00BC853F /* chip8.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = chip8.entitlements; sourceTree = "<group>"; };
+		D8314D0420FE8FA400BC853F /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		D8314D0620FE907D00BC853F /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
+		D8314D0820FE91D500BC853F /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
+		D8314D0A20FE952E00BC853F /* Emulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emulator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +67,10 @@
 				D8314CFA20FE8B1B00BC853F /* Main.storyboard */,
 				D8314CFD20FE8B1B00BC853F /* Info.plist */,
 				D8314CFE20FE8B1B00BC853F /* chip8.entitlements */,
+				D8314D0420FE8FA400BC853F /* Memory.swift */,
+				D8314D0620FE907D00BC853F /* CPU.swift */,
+				D8314D0820FE91D500BC853F /* Stack.swift */,
+				D8314D0A20FE952E00BC853F /* Emulator.swift */,
 			);
 			path = chip8;
 			sourceTree = "<group>";
@@ -133,6 +145,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8314D0B20FE952E00BC853F /* Emulator.swift in Sources */,
+				D8314D0720FE907D00BC853F /* CPU.swift in Sources */,
+				D8314D0920FE91D500BC853F /* Stack.swift in Sources */,
+				D8314D0520FE8FA400BC853F /* Memory.swift in Sources */,
 				D8314CF720FE8B1800BC853F /* ViewController.swift in Sources */,
 				D8314CF520FE8B1800BC853F /* AppDelegate.swift in Sources */,
 			);
