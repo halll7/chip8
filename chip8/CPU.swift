@@ -14,5 +14,10 @@ class CPU {
     private var addressI: Word = 0
     private var pc: Word = 0
     private var stack = Stack<Word>()
+    private let mem: Memory
+    
+    init(withMemory mem: Memory) {
+        self.mem = mem
+    }
     
 }

@@ -10,8 +10,13 @@ import AppKit
 
 class Emulator {
     
-    private let cpu = CPU()
-    private let mem = Memory()
+    private let mem: Memory
+    private let cpu: CPU
+
+    init() {
+        mem = Memory()
+        cpu = CPU(withMemory: mem)
+    }
     
     func start() {
         guard let romLocation = promptForROMFile() else {
@@ -32,7 +37,7 @@ class Emulator {
         dialog.canChooseDirectories    = true;
         dialog.canCreateDirectories    = true;
         dialog.allowsMultipleSelection = false;
-        dialog.allowedFileTypes        = ["bin"];
+        dialog.allowedFileTypes        = [];
         
         guard dialog.runModal() == .OK, let path = dialog.url?.path else {
             print("Failed to get rom location")
