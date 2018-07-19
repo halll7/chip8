@@ -13,6 +13,9 @@ typealias Byte = UInt8
 
 class Memory {
     
+    /// ROMs are loaded from 0x200
+    static let ROM_OFFSET = 0x200
+    
     private var mem = [Byte].init(repeating: 0, count: 0xFFF)
     
     func loadRom(from romLocation: String) -> Bool {
@@ -21,14 +24,14 @@ class Memory {
             return false
         }
         
-        guard data.length <= 0xFFF else {
+        guard data.length <= (0xFFF - Memory.ROM_OFFSET) else {
             print("rom too big (\(data.length) bytes)")
             return false
         }
         
-        data.getBytes(&mem, length: data.length)
+        data.getBytes(&mem + Memory.ROM_OFFSET, length: data.length)
         
-        print("+++ loaded ROM: \n \(asHexString(from: 0, to: data.length - 1))")
+        print("+++ loaded ROM: \n \(asHexString(from: 0, to: mem.count - 1))")
         
         return true
     }
@@ -42,7 +45,7 @@ class Memory {
         var hex = ""
         while i <= to {
             if (i % 16 == 0) {
-                hex.append("\n")
+                hex.append("\n\(String(format: "%03hhhX) ", i))")
             } else if (i % 8 == 0) {
                 hex.append("  ")
             }
