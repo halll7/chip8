@@ -36,6 +36,10 @@ class Memory {
         return true
     }
     
+    func opCode(at: Int) -> Word {
+        return Word(mem[at] << 8) | Word(mem[at + 1])
+    }
+    
     func asHexString(from: Int, to: Int) -> String {
         guard to >= from, to < mem.count else {
             return "invalid args"

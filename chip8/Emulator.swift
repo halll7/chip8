@@ -26,8 +26,10 @@ class Emulator {
         guard mem.loadRom(from: romLocation) else {
             return
         }
+        
+        cpu.startFetchDecodeLoop()
     }
-    
+        
     private func promptForROMFile() -> String? {
         let dialog = NSOpenPanel()
         
