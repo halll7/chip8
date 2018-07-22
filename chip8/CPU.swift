@@ -40,11 +40,11 @@ class CPU {
             let firstDigit = opcode & 0xF000
             switch firstDigit {
                 case 0x0000: decodeZeroOpcode(opcode)
-                case 0x1000: opJump(opcode)
-                case 0x2000: opCallSubroutine(opcode)
-                case 0x3000: opSkipIfRegXEqNN(opcode)
-                case 0x4000: opSkipIfRegXNotEqNN(opcode)
-                case 0x5000: opSkipIfRegXEqRegY(opcode)
+                case 0x1000: op1NNN(opcode)
+                case 0x2000: op2NNN(opcode)
+                case 0x3000: op3XNN(opcode)
+                case 0x4000: op4XNN(opcode)
+                case 0x5000: op5XY0(opcode)
                 case 0x8000: decodeEightOpcode(opcode)
                 default: print("BAD OPCODE \(opcode)")
             }
@@ -59,29 +59,34 @@ class CPU {
         
     }
     
-    private func opSkipIfRegXEqRegY(_ opcode: Word) {
+    /// skip instruction if Vx == Vy
+    private func op5XY0(_ opcode: Word) {
         let x = Int(opcode & 0x0F00)
         let y = Int(opcode & 0x00F0)
         skipNextInstruction = (registers[x] == registers[y])
     }
     
-    private func opSkipIfRegXEqNN(_ opcode: Word) {
+    /// skip instruction if Vx == NN
+    private func op3XNN(_ opcode: Word) {
         let x = Int(opcode & 0x0F00)
         let nn = opcode & 0x00FF
         skipNextInstruction = (registers[x] == nn)
     }
     
-    private func opSkipIfRegXNotEqNN(_ opcode: Word) {
+    /// skip instruction if Vx != NN
+    private func op4XNN(_ opcode: Word) {
         let x = Int(opcode & 0x0F00)
         let nn = opcode & 0x00FF
         skipNextInstruction = (registers[x] != nn)
     }
     
-    private func opJump(_ opcode: Word) {
+    /// jump to NNN
+    private func op1NNN(_ opcode: Word) {
         pc = Int(opcode & 0x0FFF)
     }
     
-    private func opCallSubroutine(_ opcode: Word) {
+    /// call subroutine
+    private func op2NNN(_ opcode: Word) {
         stack.push(pc)
         pc = Int(opcode & 0x0FFF)
     }
