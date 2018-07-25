@@ -12,8 +12,8 @@ class CPU {
     
     private var registers = [Byte].init(repeating: 0, count: 16)
     private var addressI: Word = 0
-    private var pc: Int = 0
-    private var stack = Stack<Int>()
+    private var pc: Word = 0
+    private var stack = Stack<Word>()
     private let mem: Memory
     private var skipNextInstruction = false
     
@@ -48,6 +48,10 @@ class CPU {
                 case 0x4000: op4XNN(opcode)
                 case 0x5000: op5XY0(opcode)
                 case 0x8000: decodeEightOpcode(opcode)
+                case 0x9000: op9XY0(opcode)
+                case 0xA000: opANNN(opcode)
+                case 0xB000: opBNNN(opcode)
+                case 0xC000: opCXNN(opcode)
                 default: print("BAD OPCODE \(opcode)")
             }
         }
@@ -79,6 +83,32 @@ class CPU {
     }
     
 //MARK:- opcode handlers
+    
+    /// Sets Vx to the result of a bitwise AND operation on a random number
+    /// (0 to 255) and NN.
+    private func opCXNN(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        let nn = Byte(opcode & 0x00FF)
+        let rand = Byte(arc4random_uniform(256))
+        registers[x] = nn & rand
+    }
+    
+    /// Jumps to the address NNN plus V0.
+    private func opBNNN(_ opcode: Word) {
+        pc = (opcode & 0x0FFF) + Word(registers[0])
+    }
+    
+    /// Sets I to the address NNN.
+    private func opANNN(_ opcode: Word) {
+        addressI = opcode & 0x0FFF
+    }
+    
+    /// Skips the next instruction if Vx doesn't equal Vy.
+    private func op9XY0(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        let y = Int(opcode & 0x00F0)
+        skipNextInstruction = registers[x] != registers[y]
+    }
     
     /// set Vx = Vy
     private func op8XY0(_ opcode: Word) {
@@ -186,13 +216,13 @@ class CPU {
     
     /// jump to NNN
     private func op1NNN(_ opcode: Word) {
-        pc = Int(opcode & 0x0FFF)
+        pc = opcode & 0x0FFF
     }
     
     /// call subroutine
     private func op2NNN(_ opcode: Word) {
         stack.push(pc)
-        pc = Int(opcode & 0x0FFF)
+        pc = opcode & 0x0FFF
     }
 
     /// return from subroutine

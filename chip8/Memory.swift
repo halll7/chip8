@@ -14,7 +14,7 @@ typealias Byte = UInt8
 class Memory {
     
     /// ROMs are loaded from 0x200
-    static let ROM_OFFSET = 0x200
+    static let ROM_OFFSET: Word = 0x200
     
     private var mem = [Byte].init(repeating: 0, count: 0xFFF)
     
@@ -29,15 +29,15 @@ class Memory {
             return false
         }
         
-        data.getBytes(&mem + Memory.ROM_OFFSET, length: data.length)
+        data.getBytes(&mem[Int(Memory.ROM_OFFSET)], length: data.length)
         
         print("+++ loaded ROM: \n \(asHexString(from: 0, to: mem.count - 1))")
         
         return true
     }
     
-    func opCode(at: Int) -> Word {
-        return Word(mem[at] << 8) | Word(mem[at + 1])
+    func opCode(at: Word) -> Word {
+        return Word(mem[Int(at)] << 8) | Word(mem[Int(at + 1)])
     }
     
     func asHexString(from: Int, to: Int) -> String {
