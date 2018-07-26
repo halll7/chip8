@@ -16,6 +16,8 @@ class CPU {
     private var stack = Stack<Word>()
     private let mem: Memory
     private var skipNextInstruction = false
+    private var delayTimerValue: Byte = 0
+    private var delayTimer: Timer?
     
     init(withMemory mem: Memory) {
         self.mem = mem
@@ -30,6 +32,13 @@ class CPU {
 //MARK:- fetch-decode
 
     func startFetchDecodeLoop() {
+        //the delay timer counts down at a rate of 60Hz
+        delayTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {_ in
+            if self.delayTimerValue > 0 {
+                self.delayTimerValue -= 1
+            }
+        }
+
         while true {
             let opcode = mem.opCode(at: pc)
             pc += 2
@@ -52,6 +61,9 @@ class CPU {
                 case 0xA000: opANNN(opcode)
                 case 0xB000: opBNNN(opcode)
                 case 0xC000: opCXNN(opcode)
+                case 0xD000: opDXYN(opcode)
+                case 0xE000: decodeEOpcode(opcode)
+                case 0xF000: decodeFOpcode(opcode)
                 default: print("BAD OPCODE \(opcode)")
             }
         }
@@ -69,20 +81,133 @@ class CPU {
     private func decodeEightOpcode(_ opcode: Word) {
         let lastDigit = opcode & 0x000F
         switch lastDigit {
-        case 0x0: op8XY0(opcode)
-        case 0x1: op8XY1(opcode)
-        case 0x2: op8XY2(opcode)
-        case 0x3: op8XY3(opcode)
-        case 0x4: op8XY4(opcode)
-        case 0x5: op8XY5(opcode)
-        case 0x6: op8XY6(opcode)
-        case 0x7: op8XY7(opcode)
-        case 0xE: op8XYE(opcode)
-        default: print("BAD OPCODE \(opcode)")
+            case 0x0: op8XY0(opcode)
+            case 0x1: op8XY1(opcode)
+            case 0x2: op8XY2(opcode)
+            case 0x3: op8XY3(opcode)
+            case 0x4: op8XY4(opcode)
+            case 0x5: op8XY5(opcode)
+            case 0x6: op8XY6(opcode)
+            case 0x7: op8XY7(opcode)
+            case 0xE: op8XYE(opcode)
+            default: print("BAD OPCODE \(opcode)")
+        }
+    }
+    
+    private func decodeEOpcode(_ opcode: Word) {
+        let lastTwoDigits = opcode & 0x00FF
+        switch lastTwoDigits {
+            case 0x009E: opEX9E(opcode)
+            case 0x00A1: opEXA1(opcode)
+            default: print("BAD OPCODE \(opcode)")
+        }
+    }
+    
+    private func decodeFOpcode(_ opcode: Word) {
+        let lastTwoDigits = opcode & 0x00FF
+        switch lastTwoDigits {
+            case 0x0007: opFX07(opcode)
+            case 0x000A: opFX0A(opcode)
+            case 0x0015: opFX15(opcode)
+            case 0x0018: opFX18(opcode)
+            case 0x001E: opFX1E(opcode)
+            case 0x0029: opFX29(opcode)
+            case 0x0033: opFX33(opcode)
+            case 0x0055: opFX55(opcode)
+            case 0x0065: opFX65(opcode)
+            default: print("BAD OPCODE \(opcode)")
         }
     }
     
 //MARK:- opcode handlers
+    
+    /// Sets Vx to the value of the delay timer
+    private func opFX07(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        registers[x] = delayTimerValue
+    }
+    
+    /// A key press is awaited, and then stored in Vx.
+    private func opFX0A(_ opcode: Word) {
+        //todo input
+    }
+    
+    /// Sets the delay timer to Vx.
+    private func opFX15(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        delayTimerValue = registers[x]
+    }
+    
+    /// Sets the sound timer to Vx.
+    private func opFX18(_ opcode: Word) {
+        //todo sound
+    }
+    
+    /// Adds Vx to I. Vf is set to 1 when there is a range overflow (I+Vx>0xFFFF),
+    /// and to 0 when there isn't (the overflow flag is an undocumented feature).
+    private func opFX1E(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        let vx = registers[x]
+        let sum = UInt32(addressI) + UInt32(vx)
+        registers[15] = sum > 0xFFFF ? 1 : 0
+        addressI = Word(sum % 0xFFFF)
+    }
+    
+    /// Sets I to the location of the sprite for the character in Vx. Characters
+    /// 0-F (in hexadecimal) are represented by a 4x5 font.
+    private func opFX29(_ opcode: Word) {
+        //todo
+    }
+    
+    /// Stores the binary-coded decimal representation of Vx, with the most significant
+    /// of three digits at the address in I, the middle digit at I plus 1, and the least
+    /// significant digit at I plus 2. (In other words, take the decimal representation
+    /// of VX, place the hundreds digit in memory at location in I, the tens digit at
+    /// location I+1, and the ones digit at location I+2.)
+    private func opFX33(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        mem.storeBCD(of: registers[x], at: addressI)
+    }
+    
+    /// Stores V0 to Vx (including Vx) in memory starting at address I. The offset
+    /// from I is increased by 1 for each value written, but I itself is left unmodified.
+    private func opFX55(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        var values = [Byte]()
+        for index in (0...x) {
+            values.append(registers[index])
+        }
+        mem.store(values: values, from: addressI)
+    }
+    
+    /// Fills V0 to Vx (including Vx) with values from memory starting at address I.
+    /// The offset from I is increased by 1 for each value written, but I itself is left
+    /// unmodified.
+    private func opFX65(_ opcode: Word) {
+        let x = Int(opcode & 0x0F00)
+        for regIndex in (0...x) {
+            registers[regIndex] = mem.byte(at: (addressI + Word(regIndex)))
+        }
+    }
+    
+    /// Skips the next instruction if the key stored in Vx is pressed.
+    private func opEX9E(_ opcode: Word) {
+        //todo input
+    }
+    
+    /// Skips the next instruction if the key stored in Vx is not pressed.
+    private func opEXA1(_ opcode: Word) {
+        //todo input
+    }
+    
+    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
+    /// Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t
+    /// change after the execution of this instruction. As described above, VF is set to 1 if any
+    /// screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that
+    /// doesn’t happen.
+    private func opDXYN(_ opcode: Word) {
+        //todo graphics
+    }
     
     /// Sets Vx to the result of a bitwise AND operation on a random number
     /// (0 to 255) and NN.

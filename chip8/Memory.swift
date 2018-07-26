@@ -40,6 +40,25 @@ class Memory {
         return Word(mem[Int(at)] << 8) | Word(mem[Int(at + 1)])
     }
     
+    func byte(at: Word) -> Byte {
+        return mem[Int(at)]
+    }
+    
+    func storeBCD(of byte: Byte, at location: Word) {
+        let index = Int(location)
+        mem[index] = byte / 100
+        mem[index + 1] = (byte / 10) % 10
+        mem[index + 2] = byte % 10
+    }
+    
+    func store(values: [Byte], from location: Word) {
+        var offset = Int(location)
+        values.forEach {
+            mem[offset] = $0
+            offset += 1
+        }
+    }
+    
     func asHexString(from: Int, to: Int) -> String {
         guard to >= from, to < mem.count else {
             return "invalid args"
