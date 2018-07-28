@@ -32,7 +32,7 @@ class CPU {
 //MARK:- fetch-decode
 
     func startFetchDecodeLoop() {
-        //the delay timer counts down at a rate of 60Hz
+        //start the delay timer, which counts down at a rate of 60Hz
         delayTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {_ in
             if self.delayTimerValue > 0 {
                 self.delayTimerValue -= 1
@@ -156,7 +156,8 @@ class CPU {
     /// Sets I to the location of the sprite for the character in Vx. Characters
     /// 0-F (in hexadecimal) are represented by a 4x5 font.
     private func opFX29(_ opcode: Word) {
-        //todo
+        let char = Byte((opcode & 0x0F00) >> 8)
+        addressI = mem.spriteAddress(forChar: char)
     }
     
     /// Stores the binary-coded decimal representation of Vx, with the most significant

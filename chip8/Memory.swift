@@ -16,7 +16,129 @@ class Memory {
     /// ROMs are loaded from 0x200
     static let ROM_OFFSET: Word = 0x200
     
+    private static let FONT_OFFSET: Word = 0x0
+    
     private var mem = [Byte].init(repeating: 0, count: 0xFFF)
+    
+    init() {
+        loadFonts()
+    }
+    
+    private func loadFonts() {
+        var i = Int(Memory.FONT_OFFSET)
+        
+        // 0
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 1
+        mem[i] = 0b00100000; i += 1
+        mem[i] = 0b01100000; i += 1
+        mem[i] = 0b00100000; i += 1
+        mem[i] = 0b00100000; i += 1
+        mem[i] = 0b01110000; i += 1
+        
+        // 2
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 3
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 4
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b00010000; i += 1
+        
+        // 5
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 6
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 7
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b00100000; i += 1
+        mem[i] = 0b01000000; i += 1
+        mem[i] = 0b01000000; i += 1
+        
+        // 8
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // 9
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b00010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // A
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        
+        // B
+        mem[i] = 0b11100000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11100000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11100000; i += 1
+        
+        // C
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // D
+        mem[i] = 0b11100000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b10010000; i += 1
+        mem[i] = 0b11100000; i += 1
+        
+        // E
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        
+        // F
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b11110000; i += 1
+        mem[i] = 0b10000000; i += 1
+        mem[i] = 0b10000000
+    }
     
     func loadRom(from romLocation: String) -> Bool {
         guard let data = NSData(contentsOfFile: romLocation) else {
@@ -34,6 +156,11 @@ class Memory {
         print("+++ loaded ROM: \n \(asHexString(from: 0, to: mem.count - 1))")
         
         return true
+    }
+    
+    func spriteAddress(forChar char: Byte) -> Word {
+        let index = Word(char & 0x0F)
+        return Memory.FONT_OFFSET + index
     }
     
     func opCode(at: Word) -> Word {
