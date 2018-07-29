@@ -35,7 +35,7 @@ class CPU {
 
     func startFetchDecodeLoop() {
         //start the delay timer, which counts down at a rate of 60Hz
-        delayTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {_ in
+        delayTimer = Timer.scheduledTimer(withTimeInterval: 0.0166, repeats: true) {_ in
             if self.delayTimerValue > 0 {
                 self.delayTimerValue -= 1
             }
