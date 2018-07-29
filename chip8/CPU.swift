@@ -16,12 +16,14 @@ class CPU {
     private var stack = Stack<Word>()
     private let mem: Memory
     private let video: VideoMemory
+    private let keypad: KeyPad
     private var skipNextInstruction = false
     private var delayTimerValue: Byte = 0
     private var delayTimer: Timer?
     
-    init(withMemory mem: Memory) {
+    init(withMemory mem: Memory, keyPad keypad: KeyPad) {
         self.mem = mem
+        self.keypad = keypad
         self.video = VideoMemory()
     }
     

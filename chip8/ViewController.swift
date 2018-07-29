@@ -17,12 +17,13 @@ class ViewController: NSViewController {
         emu.start()
     }
 
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
+    override func keyDown(with event: NSEvent) {
+        emu.keyDown(with: event)
     }
-
-
+    
+    override func keyUp(with event: NSEvent) {
+        emu.keyUp(with: event)
+    }
+    
 }
 

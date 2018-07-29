@@ -11,11 +11,13 @@ import AppKit
 class Emulator {
     
     private let mem: Memory
+    private let keypad: KeyPad
     private let cpu: CPU
 
     init() {
         mem = Memory()
-        cpu = CPU(withMemory: mem)
+        keypad = KeyPad()
+        cpu = CPU(withMemory: mem, keyPad: keypad)
     }
     
     func start() {
@@ -29,7 +31,15 @@ class Emulator {
         
         cpu.startFetchDecodeLoop()
     }
-        
+    
+    func keyDown(with event: NSEvent) {
+        keypad.keyDown(with: event)
+    }
+    
+    func keyUp(with event: NSEvent) {
+        keypad.keyUp(with: event)
+    }
+    
     private func promptForROMFile() -> String? {
         let dialog = NSOpenPanel()
         
