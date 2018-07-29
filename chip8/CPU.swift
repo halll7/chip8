@@ -15,12 +15,14 @@ class CPU {
     private var pc: Word = 0
     private var stack = Stack<Word>()
     private let mem: Memory
+    private let video: VideoMemory
     private var skipNextInstruction = false
     private var delayTimerValue: Byte = 0
     private var delayTimer: Timer?
     
     init(withMemory mem: Memory) {
         self.mem = mem
+        self.video = VideoMemory()
     }
     
     func reset() {
@@ -203,11 +205,21 @@ class CPU {
     
     /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
     /// Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t
-    /// change after the execution of this instruction. As described above, VF is set to 1 if any
+    /// change after the execution of this instruction. As described above, Vf is set to 1 if any
     /// screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that
     /// doesn’t happen.
     private func opDXYN(_ opcode: Word) {
-        //todo graphics
+        let x = Int(opcode & 0x0F00)
+        let y = Int(opcode & 0x00F0)
+        let n = Int(opcode & 0x000F)
+        
+        var flipped = false
+        for spriteRow in (0..<n) {
+            let rowByte = mem.byte(at: addressI + Word(spriteRow))
+            flipped = flipped || video.writePixels(fromByte: rowByte, atX: x, y: y + spriteRow)
+        }
+        
+        registers[15] = flipped ? 1 : 0
     }
     
     /// Sets Vx to the result of a bitwise AND operation on a random number
@@ -362,7 +374,7 @@ class CPU {
     
     /// clear screen
     private func op00E0(_ opcode: Word) {
-        //todo
+        video.clear()
     }
     
     /// call RCA1802 program at NNN
