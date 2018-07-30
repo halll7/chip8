@@ -24,14 +24,14 @@ class VideoMemory {
     }
     
     /// returns true if any video bits were flipped
-    func writePixels(fromByte byte: Byte, atX x: Int, y: Int) -> Bool {
+    func writePixels(fromByte byte: Byte, atX x: Byte, y: Byte) -> Bool {
         var flip = false
 
         for bitIndex in (0...7) {
             let bitWasOn = ((mem[y] << x) & maskFirst64) == maskFirst64
             let bitIsOn = ((byte << bitIndex) & maskFirst8) == maskFirst8
             flip = flip || (bitWasOn != bitIsOn)
-            let newBitMask = maskFirst64 >> (x + bitIndex)
+            let newBitMask = maskFirst64 >> (Int(x) + bitIndex)
             if bitIsOn {
                 mem[y] |= newBitMask
             } else {

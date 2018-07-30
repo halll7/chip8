@@ -83,7 +83,7 @@ class CPU {
     }
     
     private func decodeEightOpcode(_ opcode: Word) {
-        let lastDigit = opcode & 0x000F
+        let lastDigit = opcodeDigit4(opcode)
         switch lastDigit {
             case 0x0: op8XY0(opcode)
             case 0x1: op8XY1(opcode)
@@ -127,7 +127,7 @@ class CPU {
     
     /// Sets Vx to the value of the delay timer
     private func opFX07(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         registers[x] = delayTimerValue
     }
     
@@ -138,7 +138,7 @@ class CPU {
     
     /// Sets the delay timer to Vx.
     private func opFX15(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         delayTimerValue = registers[x]
     }
     
@@ -150,7 +150,7 @@ class CPU {
     /// Adds Vx to I. Vf is set to 1 when there is a range overflow (I+Vx>0xFFFF),
     /// and to 0 when there isn't (the overflow flag is an undocumented feature).
     private func opFX1E(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         let vx = registers[x]
         let sum = UInt32(addressI) + UInt32(vx)
         registers[15] = sum > 0xFFFF ? 1 : 0
@@ -160,7 +160,7 @@ class CPU {
     /// Sets I to the location of the sprite for the character in Vx. Characters
     /// 0-F (in hexadecimal) are represented by a 4x5 font.
     private func opFX29(_ opcode: Word) {
-        let char = Byte((opcode & 0x0F00) >> 8)
+        let char = Byte(opcodeDigit2(opcode))
         addressI = mem.spriteAddress(forChar: char)
     }
     
@@ -170,14 +170,14 @@ class CPU {
     /// of VX, place the hundreds digit in memory at location in I, the tens digit at
     /// location I+1, and the ones digit at location I+2.)
     private func opFX33(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         mem.storeBCD(of: registers[x], at: addressI)
     }
     
     /// Stores V0 to Vx (including Vx) in memory starting at address I. The offset
     /// from I is increased by 1 for each value written, but I itself is left unmodified.
     private func opFX55(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         var values = [Byte]()
         for index in (0...x) {
             values.append(registers[index])
@@ -189,7 +189,7 @@ class CPU {
     /// The offset from I is increased by 1 for each value written, but I itself is left
     /// unmodified.
     private func opFX65(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         for regIndex in (0...x) {
             registers[regIndex] = mem.byte(at: (addressI + Word(regIndex)))
         }
@@ -211,9 +211,9 @@ class CPU {
     /// screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that
     /// doesn’t happen.
     private func opDXYN(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
-        let n = Int(opcode & 0x000F)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
+        let n = opcodeDigit4(opcode)
         
         var flipped = false
         for spriteRow in (0..<n) {
@@ -227,7 +227,7 @@ class CPU {
     /// Sets Vx to the result of a bitwise AND operation on a random number
     /// (0 to 255) and NN.
     private func opCXNN(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         let nn = Byte(opcode & 0x00FF)
         let rand = Byte(arc4random_uniform(256))
         registers[x] = nn & rand
@@ -245,15 +245,15 @@ class CPU {
     
     /// Skips the next instruction if Vx doesn't equal Vy.
     private func op9XY0(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         skipNextInstruction = registers[x] != registers[y]
     }
     
     /// set Vx = Vy
     private func op8XY0(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         registers[x] = registers[y]
         
     }
@@ -275,16 +275,16 @@ class CPU {
     
     /// Adds Vy to Vx. VF is set to 1 when there's a carry, and to 0 when there isn't.
     private func op8XY4(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         registers[15] = (registers[x] + registers[y] > 0xF) ? 1 : 0
         registers[x] = (registers[x] + registers[y]) % 0xF
     }
     
     /// Vy is subtracted from Vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
     private func op8XY5(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         if Int(registers[x]) - Int(registers[y]) < 0 {
             registers[15] = 0
             registers[x] = 0xF - (registers[y] - registers[x])
@@ -297,16 +297,16 @@ class CPU {
     /// Shifts Vy right by one and stores the result to Vx (Vy remains unchanged).
     /// VF is set to the value of the least significant bit of Vy before the shift
     private func op8XY6(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         registers[15] = registers[y] & 0x1
         registers[x] = registers[y] >> 1
     }
     
     /// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     private func op8XY7(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         if Int(registers[y]) - Int(registers[x]) < 0 {
             registers[15] = 0
             registers[x] = 0xF - (registers[x] - registers[y])
@@ -319,8 +319,8 @@ class CPU {
     /// Shifts VY left by one and copies the result to VX.
     /// VF is set to the value of the most significant bit of VY before the shift.
     private func op8XYE(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         registers[15] = registers[y] & 0x8
         registers[x] = registers[y] << 1
     }
@@ -328,28 +328,28 @@ class CPU {
     /// applies the specified operation to Vx and Vy, where x and y are decoded
     /// from the specified opcode bytes. Result stored in Vx.
     private func applyOp(_ op: (Byte, Byte) -> Byte, forOpcode opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         registers[x] = op(registers[x], registers[y])
     }
     
     /// skip instruction if Vx == Vy
     private func op5XY0(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
-        let y = Int(opcode & 0x00F0)
+        let x = opcodeDigit2(opcode)
+        let y = opcodeDigit3(opcode)
         skipNextInstruction = (registers[x] == registers[y])
     }
     
     /// skip instruction if Vx == NN
     private func op3XNN(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         let nn = opcode & 0x00FF
         skipNextInstruction = (registers[x] == nn)
     }
     
     /// skip instruction if Vx != NN
     private func op4XNN(_ opcode: Word) {
-        let x = Int(opcode & 0x0F00)
+        let x = opcodeDigit2(opcode)
         let nn = opcode & 0x00FF
         skipNextInstruction = (registers[x] != nn)
     }
@@ -382,6 +382,24 @@ class CPU {
     /// call RCA1802 program at NNN
     private func op0NNN(_ opcode: Word) {
         print("ERROR: RCA 1802 not supported.")
+    }
+    
+//MARK:- Utils
+    
+    private func opcodeDigit1(_ opcode: Word) -> Byte {
+        return Byte((opcode & 0xF000) >> 12)
+    }
+    
+    private func opcodeDigit2(_ opcode: Word) -> Byte {
+        return Byte((opcode & 0x0F00) >> 8)
+    }
+    
+    private func opcodeDigit3(_ opcode: Word) -> Byte {
+        return Byte((opcode & 0x00F0) >> 4)
+    }
+    
+    private func opcodeDigit4(_ opcode: Word) -> Byte {
+        return Byte(opcode & 0x000F)
     }
     
 }

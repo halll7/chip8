@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D812EF85210CF74900652C5E /* VideoMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D812EF84210CF74900652C5E /* VideoMemory.swift */; };
 		D812EFB1210DE00F00652C5E /* KeyPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = D812EFB0210DE00F00652C5E /* KeyPad.swift */; };
+		D812EFB3210FA64600652C5E /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D812EFB2210FA64600652C5E /* Array+Extension.swift */; };
 		D8314CF520FE8B1800BC853F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314CF420FE8B1800BC853F /* AppDelegate.swift */; };
 		D8314CF720FE8B1800BC853F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314CF620FE8B1800BC853F /* ViewController.swift */; };
 		D8314CF920FE8B1B00BC853F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8314CF820FE8B1B00BC853F /* Assets.xcassets */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		D812EF84210CF74900652C5E /* VideoMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoMemory.swift; sourceTree = "<group>"; };
 		D812EFB0210DE00F00652C5E /* KeyPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPad.swift; sourceTree = "<group>"; };
+		D812EFB2210FA64600652C5E /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
 		D8314CF120FE8B1800BC853F /* chip8.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chip8.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8314CF420FE8B1800BC853F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8314CF620FE8B1800BC853F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				D8314D0A20FE952E00BC853F /* Emulator.swift */,
 				D812EF84210CF74900652C5E /* VideoMemory.swift */,
 				D812EFB0210DE00F00652C5E /* KeyPad.swift */,
+				D812EFB2210FA64600652C5E /* Array+Extension.swift */,
 			);
 			path = chip8;
 			sourceTree = "<group>";
@@ -154,6 +157,7 @@
 				D8314D0B20FE952E00BC853F /* Emulator.swift in Sources */,
 				D8314D0720FE907D00BC853F /* CPU.swift in Sources */,
 				D8314D0920FE91D500BC853F /* Stack.swift in Sources */,
+				D812EFB3210FA64600652C5E /* Array+Extension.swift in Sources */,
 				D8314D0520FE8FA400BC853F /* Memory.swift in Sources */,
 				D8314CF720FE8B1800BC853F /* ViewController.swift in Sources */,
 				D812EFB1210DE00F00652C5E /* KeyPad.swift in Sources */,
