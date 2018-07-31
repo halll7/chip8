@@ -12,7 +12,7 @@ class CPU {
     
     private var registers = [Byte].init(repeating: 0, count: 16)
     private var addressI: Word = 0
-    private var pc: Word = 0
+    private var pc: Word = Memory.ROM_OFFSET
     private var stack = Stack<Word>()
     private let mem: Memory
     private let video: VideoMemory

@@ -164,7 +164,7 @@ class Memory {
     }
     
     func opCode(at: Word) -> Opcode {
-        let word = Word(mem[Int(at)] << 8) | Word(mem[Int(at + 1)])
+        let word = (Word(mem[Int(at)]) << 8) | Word(mem[Int(at + 1)])
         return Opcode(withWord: word)
     }
     
