@@ -163,8 +163,9 @@ class Memory {
         return Memory.FONT_OFFSET + index
     }
     
-    func opCode(at: Word) -> Word {
-        return Word(mem[Int(at)] << 8) | Word(mem[Int(at + 1)])
+    func opCode(at: Word) -> Opcode {
+        let word = Word(mem[Int(at)] << 8) | Word(mem[Int(at + 1)])
+        return Opcode(withWord: word)
     }
     
     func byte(at: Word) -> Byte {
