@@ -19,6 +19,8 @@ class CPU {
     private let keypad: KeyPad
     private var skipNextInstruction = false
     private let delayTimer: CountdownTimer
+    private var fetchDecodeTimer: Timer?
+    private var blockFetchDecode = false
     
     init(withMemory mem: Memory, keyPad keypad: KeyPad) {
         self.mem = mem
@@ -37,33 +39,41 @@ class CPU {
 //MARK:- fetch-decode
 
     func startFetchDecodeLoop() {
-        while true {
-            let opcode = mem.opCode(at: pc)
-            pc += 2
-            
-            if skipNextInstruction {
-                skipNextInstruction = false
-                continue
-            }
-            
-            let firstDigit = opcode.digit1()
-            switch firstDigit {
-                case 0x0: decodeZeroOpcode(opcode)
-                case 0x1: op1NNN(opcode)
-                case 0x2: op2NNN(opcode)
-                case 0x3: op3XNN(opcode)
-                case 0x4: op4XNN(opcode)
-                case 0x5: op5XY0(opcode)
-                case 0x8: decodeEightOpcode(opcode)
-                case 0x9: op9XY0(opcode)
-                case 0xA: opANNN(opcode)
-                case 0xB: opBNNN(opcode)
-                case 0xC: opCXNN(opcode)
-                case 0xD: opDXYN(opcode)
-                case 0xE: decodeEOpcode(opcode)
-                case 0xF: decodeFOpcode(opcode)
-                default: print("BAD OPCODE \(opcode)")
-            }
+        fetchDecodeTimer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) {_ in
+            self.iterateFetchDecodeLoop()
+        }
+    }
+    
+    private func iterateFetchDecodeLoop() {
+        if blockFetchDecode {
+            return
+        }
+        
+        let opcode = mem.opCode(at: pc)
+        pc += 2
+        
+        if skipNextInstruction {
+            skipNextInstruction = false
+            return
+        }
+        
+        let firstDigit = opcode.digit1()
+        switch firstDigit {
+            case 0x0: decodeZeroOpcode(opcode)
+            case 0x1: op1NNN(opcode)
+            case 0x2: op2NNN(opcode)
+            case 0x3: op3XNN(opcode)
+            case 0x4: op4XNN(opcode)
+            case 0x5: op5XY0(opcode)
+            case 0x8: decodeEightOpcode(opcode)
+            case 0x9: op9XY0(opcode)
+            case 0xA: opANNN(opcode)
+            case 0xB: opBNNN(opcode)
+            case 0xC: opCXNN(opcode)
+            case 0xD: opDXYN(opcode)
+            case 0xE: decodeEOpcode(opcode)
+            case 0xF: decodeFOpcode(opcode)
+            default: print("BAD OPCODE \(opcode)")
         }
     }
     
