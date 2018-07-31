@@ -18,13 +18,14 @@ class CPU {
     private let video: VideoMemory
     private let keypad: KeyPad
     private var skipNextInstruction = false
-    private var delayTimerValue: Byte = 0
-    private var delayTimer: Timer?
+    private let delayTimer: CountdownTimer
     
     init(withMemory mem: Memory, keyPad keypad: KeyPad) {
         self.mem = mem
         self.keypad = keypad
         self.video = VideoMemory()
+        
+        self.delayTimer = CountdownTimer(withInterval: 0.0166)
     }
     
     func reset() {
@@ -36,13 +37,6 @@ class CPU {
 //MARK:- fetch-decode
 
     func startFetchDecodeLoop() {
-        //start the delay timer, which counts down at a rate of 60Hz
-        delayTimer = Timer.scheduledTimer(withTimeInterval: 0.0166, repeats: true) {_ in
-            if self.delayTimerValue > 0 {
-                self.delayTimerValue -= 1
-            }
-        }
-
         while true {
             let opcode = mem.opCode(at: pc)
             pc += 2
@@ -128,7 +122,7 @@ class CPU {
     /// Sets Vx to the value of the delay timer
     private func opFX07(_ opcode: Opcode) {
         let x = opcode.digit2()
-        registers[x] = delayTimerValue
+        registers[x] = delayTimer.value
     }
     
     /// A key press is awaited, and then stored in Vx.
@@ -139,7 +133,7 @@ class CPU {
     /// Sets the delay timer to Vx.
     private func opFX15(_ opcode: Opcode) {
         let x = opcode.digit2()
-        delayTimerValue = registers[x]
+        delayTimer.value = registers[x]
     }
     
     /// Sets the sound timer to Vx.
