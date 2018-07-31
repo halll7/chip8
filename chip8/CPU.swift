@@ -137,7 +137,12 @@ class CPU {
     
     /// A key press is awaited, and then stored in Vx.
     private func opFX0A(_ opcode: Opcode) {
-        //todo input
+        let x = opcode.digit2()
+        blockFetchDecode = true
+        keypad.awaitKeyPress() {key in
+            self.registers[x] = key
+            self.blockFetchDecode = false
+        }
     }
     
     /// Sets the delay timer to Vx.
@@ -201,12 +206,14 @@ class CPU {
     
     /// Skips the next instruction if the key stored in Vx is pressed.
     private func opEX9E(_ opcode: Opcode) {
-        //todo input
+        let key = opcode.digit2()
+        skipNextInstruction = keypad.isKeyDown(key)
     }
     
     /// Skips the next instruction if the key stored in Vx is not pressed.
     private func opEXA1(_ opcode: Opcode) {
-        //todo input
+        let key = opcode.digit2()
+        skipNextInstruction = !keypad.isKeyDown(key)
     }
     
     /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.

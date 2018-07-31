@@ -37,13 +37,36 @@ class KeyPad {
     // false otherwise.
     private var keys: [Bool]
     
+    typealias KeyPressCallback = (Byte) -> ()
+    private var keyPressCallback: KeyPressCallback?
+    
     init() {
         keys = [Bool].init(repeating: false, count: 16)
     }
    
+    func awaitKeyPress(withCompletionHandler handler: @escaping KeyPressCallback) {
+        keyPressCallback = handler
+    }
+    
+    func isKeyDown(_ key: Byte) -> Bool {
+        guard key <= 0xF else {
+            return false
+        }
+        
+        return keys[key]
+    }
+    
+    private func checkKeyPressCallback(key: Byte) {
+        if let callback = self.keyPressCallback {
+            callback(key)
+            self.keyPressCallback = nil
+        }
+    }
+    
     func keyDown(with event: NSEvent) {
         if let keyIndex = index(forKeyEvent: event) {
             keys[keyIndex] = true
+            checkKeyPressCallback(key: Byte(keyIndex))
         }
     }
     
@@ -54,7 +77,7 @@ class KeyPad {
     }
     
     /// returns the 'keys' array index corresponding to the key pressed
-    // in the specified event. Returns nil if it's not a keypad key.
+    /// in the specified event. Returns nil if it's not a keypad key.
     private func index(forKeyEvent ev: NSEvent) -> Int? {
         guard let keyString = ev.charactersIgnoringModifiers?.uppercased() else {
             return nil
