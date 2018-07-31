@@ -65,6 +65,8 @@ class CPU {
             case 0x3: op3XNN(opcode)
             case 0x4: op4XNN(opcode)
             case 0x5: op5XY0(opcode)
+            case 0x6: op6XNN(opcode)
+            case 0x7: op7XNN(opcode)
             case 0x8: decodeEightOpcode(opcode)
             case 0x9: op9XY0(opcode)
             case 0xA: opANNN(opcode)
@@ -128,6 +130,20 @@ class CPU {
     }
     
 //MARK:- opcode handlers
+    
+    /// Sets Vx to NN.
+    private func op6XNN(_ opcode: Opcode) {
+        let x = opcode.digit2()
+        let nn = opcode.lastTwoDigits()
+        registers[x] = nn
+    }
+    
+    /// Adds NN to Vx.
+    private func op7XNN(_ opcode: Opcode) {
+        let x = opcode.digit2()
+        let nn = opcode.lastTwoDigits()
+        registers[x] = moduloAddBytes(registers[x], nn)
+    }
     
     /// Sets Vx to the value of the delay timer
     private func opFX07(_ opcode: Opcode) {
@@ -288,8 +304,8 @@ class CPU {
     private func op8XY4(_ opcode: Opcode) {
         let x = opcode.digit2()
         let y = opcode.digit3()
-        registers[15] = (registers[x] + registers[y] > 0xF) ? 1 : 0
-        registers[x] = (registers[x] + registers[y]) % 0xF
+        registers[15] = doesByteAdditionOverflow(registers[x], registers[y]) ? 1 : 0
+        registers[x] = moduloAddBytes(registers[x], registers[y])
     }
     
     /// Vy is subtracted from Vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -393,6 +409,14 @@ class CPU {
     /// call RCA1802 program at NNN
     private func op0NNN(_ opcode: Opcode) {
         print("ERROR: RCA 1802 not supported.")
+    }
+    
+    private func moduloAddBytes(_ x: Byte, _ y: Byte) -> Byte {
+        return Byte((UInt16(x) + UInt16(y)) % 256)
+    }
+    
+    private func doesByteAdditionOverflow(_ x: Byte, _ y: Byte) -> Bool {
+        return UInt16(x) + UInt16(y) > 0xFF
     }
     
 }
