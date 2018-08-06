@@ -15,17 +15,20 @@ class CPU {
     private var pc: Word = Memory.ROM_OFFSET
     private var stack = Stack<Word>()
     private let mem: Memory
-    private let video: VideoMemory
+    private let videoMemory: VideoMemory
+    private let graphicsView: GraphicsView
     private let keypad: KeyPad
     private var skipNextInstruction = false
     private let delayTimer: CountdownTimer
     private var fetchDecodeTimer: Timer?
     private var blockFetchDecode = false
     
-    init(withMemory mem: Memory, keyPad keypad: KeyPad) {
+    init(withMemory mem: Memory, keyPad keypad: KeyPad, graphicsView: GraphicsView) {
         self.mem = mem
         self.keypad = keypad
-        self.video = VideoMemory()
+        self.graphicsView = graphicsView
+        self.videoMemory = VideoMemory()
+        self.graphicsView.dataSource = self.videoMemory
         
         self.delayTimer = CountdownTimer(withInterval: 0.0166)
     }
@@ -245,10 +248,12 @@ class CPU {
         var flipped = false
         for spriteRow in (0..<n) {
             let rowByte = mem.byte(at: addressI + Word(spriteRow))
-            flipped = flipped || video.writePixels(fromByte: rowByte, atX: x, y: y + spriteRow)
+            flipped = flipped || videoMemory.writePixels(fromByte: rowByte, atX: x, y: y + spriteRow)
         }
         
         registers[15] = flipped ? 1 : 0
+        
+        graphicsView.needsDisplay = true
     }
     
     /// Sets Vx to the result of a bitwise AND operation on a random number
@@ -403,7 +408,8 @@ class CPU {
     
     /// clear screen
     private func op00E0(_ opcode: Opcode) {
-        video.clear()
+        videoMemory.clear()
+        graphicsView.needsDisplay = true
     }
     
     /// call RCA1802 program at NNN

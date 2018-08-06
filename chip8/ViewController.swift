@@ -10,19 +10,21 @@ import Cocoa
 
 class ViewController: NSViewController {
 
-    private let emu = Emulator()
+    private var emu: Emulator?
+    @IBOutlet var graphicsView: GraphicsView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        emu.start()
+        emu = Emulator(withGraphicsView: graphicsView)
+        emu!.start()
     }
 
     override func keyDown(with event: NSEvent) {
-        emu.keyDown(with: event)
+        emu?.keyDown(with: event)
     }
     
     override func keyUp(with event: NSEvent) {
-        emu.keyUp(with: event)
+        emu?.keyUp(with: event)
     }
     
 }

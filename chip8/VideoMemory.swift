@@ -13,7 +13,7 @@ class VideoMemory {
     private let maskFirst64: UInt64 = 0x8000000000000000
     private let maskFirst8: Byte = 0x80
     
-    private var mem: [UInt64]
+    fileprivate var mem: [UInt64]
     
     init() {
         mem = [UInt64].init(repeating: 0x0, count: 31)
@@ -41,4 +41,12 @@ class VideoMemory {
         
         return flip
     }
+}
+
+extension VideoMemory: GraphicsViewDataSource {
+    
+    func graphicsData() -> [UInt64] {
+        return mem
+    }
+    
 }

@@ -14,10 +14,10 @@ class Emulator {
     private let keypad: KeyPad
     private let cpu: CPU
 
-    init() {
+    init(withGraphicsView view: GraphicsView) {
         mem = Memory()
         keypad = KeyPad()
-        cpu = CPU(withMemory: mem, keyPad: keypad)
+        cpu = CPU(withMemory: mem, keyPad: keypad, graphicsView: view)
     }
     
     func start() {

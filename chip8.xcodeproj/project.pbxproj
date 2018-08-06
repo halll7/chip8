@@ -20,6 +20,7 @@
 		D8314D0720FE907D00BC853F /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0620FE907D00BC853F /* CPU.swift */; };
 		D8314D0920FE91D500BC853F /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0820FE91D500BC853F /* Stack.swift */; };
 		D8314D0B20FE952E00BC853F /* Emulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8314D0A20FE952E00BC853F /* Emulator.swift */; };
+		D8B4B0B32118D45C00156FAD /* GraphicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B4B0B22118D45C00156FAD /* GraphicsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		D8314D0620FE907D00BC853F /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 		D8314D0820FE91D500BC853F /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
 		D8314D0A20FE952E00BC853F /* Emulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emulator.swift; sourceTree = "<group>"; };
+		D8B4B0B22118D45C00156FAD /* GraphicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				D812EFB2210FA64600652C5E /* Array+Extension.swift */,
 				D812EFD02110CABE00652C5E /* Opcode.swift */,
 				D812EFD22110D1B600652C5E /* CountdownTimer.swift */,
+				D8B4B0B22118D45C00156FAD /* GraphicsView.swift */,
 			);
 			path = chip8;
 			sourceTree = "<group>";
@@ -165,6 +168,7 @@
 				D8314D0720FE907D00BC853F /* CPU.swift in Sources */,
 				D8314D0920FE91D500BC853F /* Stack.swift in Sources */,
 				D812EFB3210FA64600652C5E /* Array+Extension.swift in Sources */,
+				D8B4B0B32118D45C00156FAD /* GraphicsView.swift in Sources */,
 				D8314D0520FE8FA400BC853F /* Memory.swift in Sources */,
 				D812EFD12110CABE00652C5E /* Opcode.swift in Sources */,
 				D8314CF720FE8B1800BC853F /* ViewController.swift in Sources */,
