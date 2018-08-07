@@ -30,7 +30,7 @@ class GraphicsView: NSView {
         }
 
         let pixelWidth: CGFloat = self.bounds.size.width / 64
-        let pixelHeight = pixelWidth / 2
+        let pixelHeight: CGFloat = self.bounds.size.height / 32
         
         context.saveGState()
         for rowIndex in (0..<data.count) {
