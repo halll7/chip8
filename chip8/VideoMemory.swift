@@ -30,7 +30,7 @@ class VideoMemory {
         for bitIndex in (0...7) {
             let bitWasOn = ((mem[y] << x) & maskFirst64) == maskFirst64
             let bitIsOn = ((byte << bitIndex) & maskFirst8) == maskFirst8
-            flip = flip || (bitWasOn != bitIsOn)
+            flip = flip || (bitWasOn && (!bitIsOn))
             let newBitMask = maskFirst64 >> (Int(x) + bitIndex)
             if bitIsOn {
                 mem[y] |= newBitMask
