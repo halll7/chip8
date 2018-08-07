@@ -28,10 +28,11 @@ class VideoMemory {
         var flip = false
 
         for bitIndex in (0...7) {
-            let bitWasOn = ((mem[y] << x) & maskFirst64) == maskFirst64
+            let bitShift = Int(x) + bitIndex
+            let bitWasOn = ((mem[y] << bitShift) & maskFirst64) == maskFirst64
             let bitIsOn = ((byte << bitIndex) & maskFirst8) == maskFirst8
             flip = flip || (bitWasOn && (!bitIsOn))
-            let newBitMask = maskFirst64 >> (Int(x) + bitIndex)
+            let newBitMask = maskFirst64 >> bitShift
             if bitIsOn {
                 mem[y] |= newBitMask
             } else {
