@@ -160,7 +160,7 @@ class Memory {
     
     func spriteAddress(forChar char: Byte) -> Word {
         let index = Word(char & 0x0F)
-        return Memory.FONT_OFFSET + index
+        return Memory.FONT_OFFSET + (index * 5)
     }
     
     func opCode(at: Word) -> Opcode {
