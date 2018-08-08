@@ -225,13 +225,13 @@ class CPU {
     
     /// Skips the next instruction if the key stored in Vx is pressed.
     private func opEX9E(_ opcode: Opcode) {
-        let key = opcode.digit2()
+        let key = registers[opcode.digit2()]
         skipNextInstruction = keypad.isKeyDown(key)
     }
     
     /// Skips the next instruction if the key stored in Vx is not pressed.
     private func opEXA1(_ opcode: Opcode) {
-        let key = opcode.digit2()
+        let key = registers[opcode.digit2()]
         skipNextInstruction = !keypad.isKeyDown(key)
     }
     
