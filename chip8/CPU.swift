@@ -319,7 +319,7 @@ class CPU {
         let y = opcode.digit3()
         if Int(registers[x]) - Int(registers[y]) < 0 {
             registers[15] = 0
-            registers[x] = 0xF - (registers[y] - registers[x])
+            registers[x] = 0xFF - (registers[y] - registers[x]) + 1
         } else {
             registers[15] = 1
             registers[x] = registers[x] - registers[y]
