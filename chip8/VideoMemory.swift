@@ -16,11 +16,11 @@ class VideoMemory {
     fileprivate var mem: [UInt64]
     
     init() {
-        mem = [UInt64].init(repeating: 0x0, count: 31)
+        mem = [UInt64].init(repeating: 0x0, count: 32)
     }
     
     func clear() {
-        mem = [UInt64].init(repeating: 0x0, count: 31)
+        mem = [UInt64].init(repeating: 0x0, count: 32)
     }
     
     /// returns true if any video bits were flipped
