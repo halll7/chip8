@@ -15,6 +15,17 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSEvent.addLocalMonitorForEvents(matching: .keyUp) {event in
+            self.keyUp(with: event)
+            return nil
+        }
+        
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) {event in
+            self.keyDown(with: event)
+            return nil
+        }
+        
         emu = Emulator(withGraphicsView: graphicsView)
         emu!.start()
     }
