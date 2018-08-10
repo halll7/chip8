@@ -326,13 +326,11 @@ class CPU {
         }
     }
     
-    /// Shifts Vy right by one and stores the result to Vx (Vy remains unchanged).
-    /// VF is set to the value of the least significant bit of Vy before the shift
+    /// Stores the least significant bit of VX in VF and then shifts VX to the right by 1
     private func op8XY6(_ opcode: Opcode) {
         let x = opcode.digit2()
-        let y = opcode.digit3()
-        registers[15] = registers[y] & 0x1
-        registers[x] = registers[y] >> 1
+        registers[15] = registers[x] & 0x01
+        registers[x] = registers[x] >> 1
     }
     
     /// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -348,13 +346,11 @@ class CPU {
         }
     }
     
-    /// Shifts VY left by one and copies the result to VX.
-    /// VF is set to the value of the most significant bit of VY before the shift.
+    /// Stores the most significant bit of VX in VF and then shifts VX to the left by 1
     private func op8XYE(_ opcode: Opcode) {
         let x = opcode.digit2()
-        let y = opcode.digit3()
-        registers[15] = registers[y] & 0x8
-        registers[x] = registers[y] << 1
+        registers[15] = registers[x] >> 7
+        registers[x] = registers[x] << 1
     }
     
     /// applies the specified operation to Vx and Vy, where x and y are decoded
