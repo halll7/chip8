@@ -23,15 +23,16 @@ class VideoMemory {
         mem = [UInt64].init(repeating: 0x0, count: 32)
     }
     
-    /// returns true if any video bits were flipped
+    /// returns true if any pixels were unset
     func writePixels(fromByte byte: Byte, atX x: Byte, y: Byte) -> Bool {
-        var flip = false
-
+        var pixelWasUnset = false
+        
         for bitIndex in (0...7) {
             let bitShift = Int(x) + bitIndex
             let bitWasOn = ((mem[y] << bitShift) & maskFirst64) == maskFirst64
-            let bitIsOn = ((byte << bitIndex) & maskFirst8) == maskFirst8
-            flip = flip || (bitWasOn && (!bitIsOn))
+            let writeBitIsOn = ((byte << bitIndex) & maskFirst8) == maskFirst8
+            let bitIsOn = bitWasOn != writeBitIsOn
+            pixelWasUnset = pixelWasUnset || (bitWasOn && (!bitIsOn))
             let newBitMask = maskFirst64 >> bitShift
             if bitIsOn {
                 mem[y] |= newBitMask
@@ -40,7 +41,7 @@ class VideoMemory {
             }
         }
         
-        return flip
+        return pixelWasUnset
     }
 }
 
