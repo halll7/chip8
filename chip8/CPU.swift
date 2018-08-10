@@ -188,7 +188,7 @@ class CPU {
     /// Sets I to the location of the sprite for the character in Vx. Characters
     /// 0-F (in hexadecimal) are represented by a 4x5 font.
     private func opFX29(_ opcode: Opcode) {
-        let char = Byte(opcode.digit2())
+        let char = registers[opcode.digit2()]
         addressI = mem.spriteAddress(forChar: char)
     }
     
