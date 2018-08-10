@@ -42,7 +42,7 @@ class CPU {
 //MARK:- fetch-decode
 
     func startFetchDecodeLoop() {
-        fetchDecodeTimer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) {_ in
+        fetchDecodeTimer = Timer.scheduledTimer(withTimeInterval: 0.003, repeats: true) {_ in
             self.iterateFetchDecodeLoop()
         }
     }
@@ -248,7 +248,7 @@ class CPU {
         var flipped = false
         for spriteRow in (0..<n) {
             let rowByte = mem.byte(at: addressI + Word(spriteRow))
-            flipped = flipped || videoMemory.writePixels(fromByte: rowByte, atX: registers[x], y: registers[y] + spriteRow)
+            flipped = videoMemory.writePixels(fromByte: rowByte, atX: registers[x], y: registers[y] + spriteRow) || flipped
         }
         
         registers[15] = flipped ? 1 : 0
