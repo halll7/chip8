@@ -22,10 +22,12 @@ class Emulator {
     
     func start() {
         guard let romLocation = promptForROMFile() else {
+            NSApplication.shared.terminate(NSApplication.shared)
             return
         }
         
         guard mem.loadRom(from: romLocation) else {
+            NSApplication.shared.terminate(NSApplication.shared)
             return
         }
         
