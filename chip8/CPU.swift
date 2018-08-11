@@ -243,7 +243,8 @@ class CPU {
         var flipped = false
         for spriteRow in (0..<n) {
             let rowByte = mem.byte(at: addressI + Word(spriteRow))
-            flipped = videoMemory.writePixels(fromByte: rowByte, atX: registers[x], y: registers[y] + spriteRow) || flipped
+            let wrappedY = (registers[y] + spriteRow) % 32
+            flipped = videoMemory.writePixels(fromByte: rowByte, atX: registers[x], y: wrappedY) || flipped
         }
         
         registers[15] = flipped ? 1 : 0
