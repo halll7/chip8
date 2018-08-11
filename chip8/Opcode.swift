@@ -16,27 +16,27 @@ struct Opcode {
         code = word
     }
     
-    func digit1() -> Byte {
+    var firstNibble: Byte {
         return Byte((code & 0xF000) >> 12)
     }
     
-    func digit2() -> Byte {
+    var x: Byte {
         return Byte((code & 0x0F00) >> 8)
     }
     
-    func digit3() -> Byte {
+    var y: Byte {
         return Byte((code & 0x00F0) >> 4)
     }
     
-    func digit4() -> Byte {
+    var n: Byte {
         return Byte(code & 0x000F)
     }
     
-    func lastThreeDigits() -> Word {
+    var nnn: Word {
         return code & 0x0FFF
     }
     
-    func lastTwoDigits() -> Byte {
+    var nn: Byte {
         return Byte(code & 0x00FF)
     }
     

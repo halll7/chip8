@@ -60,8 +60,7 @@ class CPU {
             return
         }
         
-        let firstDigit = opcode.digit1()
-        switch firstDigit {
+        switch opcode.firstNibble {
             case 0x0: decodeZeroOpcode(opcode)
             case 0x1: op1NNN(opcode)
             case 0x2: op2NNN(opcode)
@@ -83,8 +82,7 @@ class CPU {
     }
     
     private func decodeZeroOpcode(_ opcode: Opcode) {
-        let lastThreeDigits = opcode.lastThreeDigits()
-        switch lastThreeDigits {
+        switch opcode.nnn {
             case 0x00E0: op00E0(opcode)
             case 0x00EE: op00EE(opcode)
             default: op0NNN(opcode)
@@ -92,8 +90,7 @@ class CPU {
     }
     
     private func decodeEightOpcode(_ opcode: Opcode) {
-        let lastDigit = opcode.digit4()
-        switch lastDigit {
+        switch opcode.n {
             case 0x0: op8XY0(opcode)
             case 0x1: op8XY1(opcode)
             case 0x2: op8XY2(opcode)
@@ -108,8 +105,7 @@ class CPU {
     }
     
     private func decodeEOpcode(_ opcode: Opcode) {
-        let lastTwoDigits = opcode.lastTwoDigits()
-        switch lastTwoDigits {
+        switch opcode.nn {
             case 0x009E: opEX9E(opcode)
             case 0x00A1: opEXA1(opcode)
             default: print("BAD OPCODE \(opcode)")
@@ -117,8 +113,7 @@ class CPU {
     }
     
     private func decodeFOpcode(_ opcode: Opcode) {
-        let lastTwoDigits = opcode.lastTwoDigits()
-        switch lastTwoDigits {
+        switch opcode.nn {
             case 0x0007: opFX07(opcode)
             case 0x000A: opFX0A(opcode)
             case 0x0015: opFX15(opcode)
@@ -136,27 +131,27 @@ class CPU {
     
     /// Sets Vx to NN.
     private func op6XNN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let nn = opcode.lastTwoDigits()
+        let x = opcode.x
+        let nn = opcode.nn
         registers[x] = nn
     }
     
     /// Adds NN to Vx.
     private func op7XNN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let nn = opcode.lastTwoDigits()
+        let x = opcode.x
+        let nn = opcode.nn
         registers[x] = moduloAddBytes(registers[x], nn)
     }
     
     /// Sets Vx to the value of the delay timer
     private func opFX07(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         registers[x] = delayTimer.value
     }
     
     /// A key press is awaited, and then stored in Vx.
     private func opFX0A(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         blockFetchDecode = true
         keypad.awaitKeyPress() {key in
             self.registers[x] = key
@@ -166,7 +161,7 @@ class CPU {
     
     /// Sets the delay timer to Vx.
     private func opFX15(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         delayTimer.value = registers[x]
     }
     
@@ -178,7 +173,7 @@ class CPU {
     /// Adds Vx to I. Vf is set to 1 when there is a range overflow (I+Vx>0xFFFF),
     /// and to 0 when there isn't (the overflow flag is an undocumented feature).
     private func opFX1E(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         let vx = registers[x]
         let sum = UInt32(addressI) + UInt32(vx)
         registers[15] = sum > 0xFFFF ? 1 : 0
@@ -188,7 +183,7 @@ class CPU {
     /// Sets I to the location of the sprite for the character in Vx. Characters
     /// 0-F (in hexadecimal) are represented by a 4x5 font.
     private func opFX29(_ opcode: Opcode) {
-        let char = registers[opcode.digit2()]
+        let char = registers[opcode.x]
         addressI = mem.spriteAddress(forChar: char)
     }
     
@@ -198,14 +193,14 @@ class CPU {
     /// of VX, place the hundreds digit in memory at location in I, the tens digit at
     /// location I+1, and the ones digit at location I+2.)
     private func opFX33(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         mem.storeBCD(of: registers[x], at: addressI)
     }
     
     /// Stores V0 to Vx (including Vx) in memory starting at address I. The offset
     /// from I is increased by 1 for each value written, but I itself is left unmodified.
     private func opFX55(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         var values = [Byte]()
         for index in (0...x) {
             values.append(registers[index])
@@ -217,7 +212,7 @@ class CPU {
     /// The offset from I is increased by 1 for each value written, but I itself is left
     /// unmodified.
     private func opFX65(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         for regIndex in (0...x) {
             registers[regIndex] = mem.byte(at: (addressI + Word(regIndex)))
         }
@@ -225,13 +220,13 @@ class CPU {
     
     /// Skips the next instruction if the key stored in Vx is pressed.
     private func opEX9E(_ opcode: Opcode) {
-        let key = registers[opcode.digit2()]
+        let key = registers[opcode.x]
         skipNextInstruction = keypad.isKeyDown(key)
     }
     
     /// Skips the next instruction if the key stored in Vx is not pressed.
     private func opEXA1(_ opcode: Opcode) {
-        let key = registers[opcode.digit2()]
+        let key = registers[opcode.x]
         skipNextInstruction = !keypad.isKeyDown(key)
     }
     
@@ -241,9 +236,9 @@ class CPU {
     /// screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that
     /// doesn’t happen.
     private func opDXYN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
-        let n = opcode.digit4()
+        let x = opcode.x
+        let y = opcode.y
+        let n = opcode.n
         
         var flipped = false
         for spriteRow in (0..<n) {
@@ -259,33 +254,33 @@ class CPU {
     /// Sets Vx to the result of a bitwise AND operation on a random number
     /// (0 to 255) and NN.
     private func opCXNN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let nn = opcode.lastTwoDigits()
+        let x = opcode.x
+        let nn = opcode.nn
         let rand = Byte(arc4random_uniform(256))
         registers[x] = nn & rand
     }
     
     /// Jumps to the address NNN plus V0.
     private func opBNNN(_ opcode: Opcode) {
-        pc = opcode.lastThreeDigits() + Word(registers[0])
+        pc = opcode.nnn + Word(registers[0])
     }
     
     /// Sets I to the address NNN.
     private func opANNN(_ opcode: Opcode) {
-        addressI = opcode.lastThreeDigits()
+        addressI = opcode.nnn
     }
     
     /// Skips the next instruction if Vx doesn't equal Vy.
     private func op9XY0(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         skipNextInstruction = registers[x] != registers[y]
     }
     
     /// set Vx = Vy
     private func op8XY0(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         registers[x] = registers[y]
         
     }
@@ -307,16 +302,16 @@ class CPU {
     
     /// Adds Vy to Vx. VF is set to 1 when there's a carry, and to 0 when there isn't.
     private func op8XY4(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         registers[15] = doesByteAdditionOverflow(registers[x], registers[y]) ? 1 : 0
         registers[x] = moduloAddBytes(registers[x], registers[y])
     }
     
     /// Vy is subtracted from Vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
     private func op8XY5(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         if Int(registers[x]) - Int(registers[y]) < 0 {
             registers[15] = 0
             registers[x] = 0xFF - (registers[y] - registers[x]) + 1
@@ -328,15 +323,15 @@ class CPU {
     
     /// Stores the least significant bit of VX in VF and then shifts VX to the right by 1
     private func op8XY6(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         registers[15] = registers[x] & 0x01
         registers[x] = registers[x] >> 1
     }
     
     /// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     private func op8XY7(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         if Int(registers[y]) - Int(registers[x]) < 0 {
             registers[15] = 0
             registers[x] = 0xFF - (registers[x] - registers[y])
@@ -348,7 +343,7 @@ class CPU {
     
     /// Stores the most significant bit of VX in VF and then shifts VX to the left by 1
     private func op8XYE(_ opcode: Opcode) {
-        let x = opcode.digit2()
+        let x = opcode.x
         registers[15] = registers[x] >> 7
         registers[x] = registers[x] << 1
     }
@@ -356,41 +351,41 @@ class CPU {
     /// applies the specified operation to Vx and Vy, where x and y are decoded
     /// from the specified opcode bytes. Result stored in Vx.
     private func applyOp(_ op: (Byte, Byte) -> Byte, forOpcode opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         registers[x] = op(registers[x], registers[y])
     }
     
     /// skip instruction if Vx == Vy
     private func op5XY0(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let y = opcode.digit3()
+        let x = opcode.x
+        let y = opcode.y
         skipNextInstruction = (registers[x] == registers[y])
     }
     
     /// skip instruction if Vx == NN
     private func op3XNN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let nn = opcode.lastTwoDigits()
+        let x = opcode.x
+        let nn = opcode.nn
         skipNextInstruction = (registers[x] == nn)
     }
     
     /// skip instruction if Vx != NN
     private func op4XNN(_ opcode: Opcode) {
-        let x = opcode.digit2()
-        let nn = opcode.lastTwoDigits()
+        let x = opcode.x
+        let nn = opcode.nn
         skipNextInstruction = (registers[x] != nn)
     }
     
     /// jump to NNN
     private func op1NNN(_ opcode: Opcode) {
-        pc = opcode.lastThreeDigits()
+        pc = opcode.nnn
     }
     
     /// call subroutine
     private func op2NNN(_ opcode: Opcode) {
         stack.push(pc)
-        pc = opcode.lastThreeDigits()
+        pc = opcode.nnn
     }
 
     /// return from subroutine
